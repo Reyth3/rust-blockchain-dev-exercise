@@ -19,7 +19,8 @@ pub fn instantiate(
     let cfg = Config {
         admin : _info.sender.clone(),
         min_votes : _msg.min_votes,
-        percentage : _msg.percentage
+        percentage : _msg.percentage,
+        cur_votes : 0,
     };
 
     let result = store_config(deps.storage, &cfg);
