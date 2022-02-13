@@ -3,7 +3,7 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary};
 use governance_types::errors::ContractError;
 use governance_types::types::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::execute::execute_vote;
+use crate::execute::{execute_vote, execute_whitelist};
 use crate::queries::query_config;
 use crate::state::{Config, store_config, read_config};
 
@@ -44,6 +44,7 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg {
         // TODO add required method types and handlers for each.
+        ExecuteMsg::Whitelist { address, status } => execute_whitelist(deps, env, info, address, status),
         ExecuteMsg::Vote { vote } => execute_vote(deps, env, info, vote)
     }
 }

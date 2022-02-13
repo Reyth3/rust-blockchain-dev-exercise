@@ -18,6 +18,7 @@ pub struct Config {
 
 const CONFIG: Item<Config> = Item::new("\u{0}\u{6}config"); 
 const VOTES: Map<&[u8], i8> = Map::new("votes");
+const WHITELIST: Map<&[u8], bool> = Map::new("whitelist");
 
 // ===============
 // Config Helper Functions
@@ -39,4 +40,24 @@ pub fn already_voted(storage: &dyn Storage, addr: &[u8]) -> bool {
 
 pub fn cast_vote(storage: &mut dyn Storage, addr: &[u8], vote: i8) -> StdResult<()> {
     return VOTES.save(storage, addr, &vote);
+}
+
+// ===============
+// Whitelist Helper Functions
+// ===============
+pub fn set_whitelist_status(storage: &mut dyn Storage, addr: &[u8], status: bool`) -> StdResult<()> {
+    return WHITELIST.save(storage, addr, &status);
+}
+
+pub fn get_whitelist_status(storage: &dyn Storage, addr: &[u8], status: bool`) -> bool {
+    let result = WHITELIST.may_load(storage, addr);
+    match result {
+        Ok(x) => {
+            match x {
+                Some(x) => return x,
+                None => return false
+            }
+        },
+        Err(x) => return false
+    }
 }
