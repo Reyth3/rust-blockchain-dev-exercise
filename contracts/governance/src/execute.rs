@@ -1,7 +1,7 @@
-use crate::state::set_whitelist_status;
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 use governance_types::errors::ContractError;
-use crate::state::{cast_vote,already_voted,read_config,store_config}; // I don't think I can actually do it like that, since this is a dependant package? But I don't have any other ideas
+use crate::state::{cast_vote,already_voted,
+    read_config,store_config,set_whitelist_status,get_whitelist_status}; // I don't think I can actually do it like that, since this is a dependant package? But I don't have any other ideas
 
 pub fn execute_vote(
     deps: DepsMut,
@@ -11,6 +11,11 @@ pub fn execute_vote(
 ) -> Result<Response, ContractError> {
     
     let addr = deps.api.addr_canonicalize(&info.sender.as_str())?;
+    let whitelisted = get_whitelist_status(deps.storage, addr.as_slice());
+    if whitelisted == false {
+        return Err(ContractError::Unauthorized {})
+    }
+
     let voted = already_voted(deps.storage, addr.as_slice());
     if voted == true {
         return Err(ContractError::AlreadyVoted { voter : info.sender })
@@ -48,8 +53,8 @@ pub fn execute_whitelist(
 
 
     return Ok(Response::new()
-        .add_attribute("action", "execute vote")
-        .add_attribute("voter", info.sender.as_str())
-        .add_attribute("vote", vote.to_string())
+        .add_attribute("action", "execute whitelist")
+        .add_attribute("address", address)
+        .add_attribute("status", status.to_string())
     );
 }

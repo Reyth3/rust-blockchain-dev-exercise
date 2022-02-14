@@ -11,6 +11,7 @@ pub struct Config {
     //TODO contract admin, voting settings
     //pub name : String, // Could possibly be useful for identifying multiple issues to vote on in frontend? dunno
     pub admin : Addr,
+    pub ongoing : bool, // this flag will determine whether the result can be shown conclusively
     pub min_votes : u32,
     pub percentage : u8,
     pub cur_votes : u32,
@@ -45,11 +46,11 @@ pub fn cast_vote(storage: &mut dyn Storage, addr: &[u8], vote: i8) -> StdResult<
 // ===============
 // Whitelist Helper Functions
 // ===============
-pub fn set_whitelist_status(storage: &mut dyn Storage, addr: &[u8], status: bool`) -> StdResult<()> {
+pub fn set_whitelist_status(storage: &mut dyn Storage, addr: &[u8], status: bool) -> StdResult<()> {
     return WHITELIST.save(storage, addr, &status);
 }
 
-pub fn get_whitelist_status(storage: &dyn Storage, addr: &[u8], status: bool`) -> bool {
+pub fn get_whitelist_status(storage: &dyn Storage, addr: &[u8]) -> bool {
     let result = WHITELIST.may_load(storage, addr);
     match result {
         Ok(x) => {

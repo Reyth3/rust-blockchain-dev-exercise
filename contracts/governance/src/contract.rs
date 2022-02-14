@@ -18,6 +18,7 @@ pub fn instantiate(
 ) -> StdResult<Response> {
     let cfg = Config {
         admin : _info.sender.clone(),
+        ongoing : true,
         min_votes : _msg.min_votes,
         percentage : _msg.percentage,
         cur_votes : 0,
