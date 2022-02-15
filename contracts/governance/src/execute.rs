@@ -13,7 +13,7 @@ pub fn execute_vote(
     let addr = deps.api.addr_canonicalize(&info.sender.as_str())?;
     let whitelisted = get_whitelist_status(deps.storage, addr.as_slice());
     if whitelisted == false {
-        return Err(ContractError::Unauthorized {})
+        return Err(ContractError::Unauthorized {});
     }
 
     let voted = already_voted(deps.storage, addr.as_slice());
@@ -51,6 +51,27 @@ pub fn execute_whitelist(
         
     set_whitelist_status(deps.storage, addr.as_slice(), status)?;
 
+
+    return Ok(Response::new()
+        .add_attribute("action", "execute whitelist")
+        .add_attribute("address", address)
+        .add_attribute("status", status.to_string())
+    );
+}
+
+pub fn execute_close(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+) -> Result<Response, ContractError> {
+    
+    let mut cfg = read_config(deps.storage)?;
+    if info.sender != cfg.admin {
+        return Err(ContractError::Unauthorized {});
+    }
+        
+    cfg.ongoing = false;
+    store_config(deps.storage, &cfg)?;
 
     return Ok(Response::new()
         .add_attribute("action", "execute whitelist")

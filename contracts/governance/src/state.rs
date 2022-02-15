@@ -1,4 +1,4 @@
-use cosmwasm_std::{StdResult, Storage, Addr};
+use cosmwasm_std::{StdResult, Storage, Addr, Order};
 use cw_storage_plus::{Item, Map};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -15,6 +15,14 @@ pub struct Config {
     pub min_votes : u32,
     pub percentage : u8,
     pub cur_votes : u32,
+}
+
+pub struct VoteSummary {
+    pub for_count : u32,
+    pub against_count : u32,
+    pub abstain_count : u32,
+    pub for_percentage : u8,
+    pub against_percentage : u8,
 }
 
 const CONFIG: Item<Config> = Item::new("\u{0}\u{6}config"); 
@@ -41,6 +49,13 @@ pub fn already_voted(storage: &dyn Storage, addr: &[u8]) -> bool {
 
 pub fn cast_vote(storage: &mut dyn Storage, addr: &[u8], vote: i8) -> StdResult<()> {
     return VOTES.save(storage, addr, &vote);
+}
+
+pub fn count_votes(storage : &dyn Storage)
+{
+    for VOTES.range(storage, None, None, Order::Ascending) {
+
+    }
 }
 
 // ===============

@@ -11,7 +11,8 @@ pub struct InstantiateMsg {
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg {
     Vote { vote : i8 },
-    Whitelist { address : String, status : bool } // 'status' will let un-whitelist in the future if needed
+    Whitelist { address : String, status : bool }, // 'status' will let un-whitelist in the future if needed
+    Close {}, // The admin has an option to close the vote when the requirements are met
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
