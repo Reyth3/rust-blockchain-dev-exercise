@@ -1,3 +1,7 @@
+use governance_types::types::Settlement;
+use governance_types::types::ResolvedResult;
+use governance_types::types::StatusResponse;
+use governance_types::types::ConfigResponse;
 use std::env::current_dir;
 use std::fs::create_dir_all;
 
@@ -14,4 +18,8 @@ fn main() {
     export_schema(&schema_for!(InstantiateMsg), &out_dir);
     export_schema(&schema_for!(ExecuteMsg), &out_dir);
     export_schema(&schema_for!(QueryMsg), &out_dir);
+    export_schema(&schema_for!(ConfigResponse), &out_dir);
+    export_schema(&schema_for!(StatusResponse), &out_dir);
+    export_schema(&schema_for!(ResolvedResult), &out_dir);
+    export_schema(&schema_for!(Settlement), &out_dir);
 }

@@ -4,8 +4,8 @@ use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
 use governance_types::errors::ContractError;
 use governance_types::types::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 use crate::execute::{execute_vote, execute_whitelist, execute_close};
-use crate::queries::{query_config, query_status};
-use crate::state::{Config, store_config, read_config};
+use crate::queries::{query_config, query_status, query_voter};
+use crate::state::{Config, store_config};
 
 
 // Method is executed when a new contract instance is created. You can treat it as a constructor.
@@ -58,8 +58,8 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> Result<Binary, ContractErr
         QueryMsg::Config {} => {
             Ok(to_binary(&query_config(deps)?)?)
         }
-        QueryMsg::GetVoter { .. } => {
-            Ok(to_binary(&{})?)
+        QueryMsg::GetVoter { address } => {
+            Ok(to_binary(&query_voter(deps, address)?)?)
         }
         QueryMsg::GetStatus { } => {
             Ok(to_binary(&query_status(deps)?)?)
@@ -75,3 +75,28 @@ pub fn migrate(
 ) -> StdResult<Response> {
     Ok(Response::default())
 }
+
+/*#[cfg(test)]
+mod tests {
+    use super::*;
+    use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info, MOCK_CONTRACT_ADDR};
+    use cosmwasm_std::{attr, coins, CosmosMsg};
+
+    #[test]
+    fn proper_initialization() {
+        let mut deps = mock_dependencies(&[]);
+
+        let msg = InstantiateMsg {
+            min_votes : 25,
+            percentage: 50
+        };
+        let info = mock_info("creator", &coins(1, "BTC"));
+
+        
+        let res = instantiate(deps.as_mut(), mock_env(), info, msg).unwrap();
+        assert_eq!(0, res.messages.len());
+
+        assert_eq!(info.sender, res.) // TODO custom response for the instantiate call maybe
+
+    }
+}*/

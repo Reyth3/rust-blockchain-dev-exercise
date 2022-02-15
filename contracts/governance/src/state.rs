@@ -86,8 +86,8 @@ pub fn count_votes(storage : &dyn Storage) -> StdResult<VoteSummary>
     // This is the new way.
     let enumerate = VOTES.range(storage, None, None, Order::Ascending).enumerate();
     for vote in enumerate {
-        let (i, item) = vote;
-        let (k,v) = item?;
+        let (_i, item) = vote;
+        let (_k,v) = item?;
         // I'd rather have this look a bit more ugly than try shortcuts and mess something up in the process tbh
         if v == -1 { // Against
             ac += 1;
@@ -129,6 +129,6 @@ pub fn get_whitelist_status(storage: &dyn Storage, addr: &[u8]) -> bool {
                 None => return false
             }
         },
-        Err(x) => return false
+        Err(_x) => return false
     }
 }

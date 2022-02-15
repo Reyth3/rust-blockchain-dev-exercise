@@ -11,7 +11,12 @@ pub fn execute_vote(
     info: MessageInfo,
     vote : i8,
 ) -> Result<Response, ContractError> {
+    let mut cfg = read_config(deps.storage)?;
     
+    if cfg.ongoing == false {
+        return Err(ContractError::AlreadyEnded {});
+    }
+
     let addr = deps.api.addr_canonicalize(&info.sender.as_str())?;
     let whitelisted = get_whitelist_status(deps.storage, addr.as_slice());
     if whitelisted == false {
@@ -25,7 +30,6 @@ pub fn execute_vote(
     
     cast_vote(deps.storage, addr.as_slice(), vote)?;
     
-    let mut cfg = read_config(deps.storage)?;
     cfg.cur_votes+= 1;
     store_config(deps.storage, &cfg)?;
 
@@ -45,6 +49,11 @@ pub fn execute_whitelist(
 ) -> Result<Response, ContractError> {
     
     let cfg = read_config(deps.storage)?;
+    
+    if cfg.ongoing == false {
+        return Err(ContractError::AlreadyEnded {});
+    }
+    
     if info.sender != cfg.admin {
         return Err(ContractError::Unauthorized {});
     }

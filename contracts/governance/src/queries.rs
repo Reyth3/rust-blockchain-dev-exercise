@@ -1,8 +1,9 @@
 use crate::state::count_votes;
 use cosmwasm_std::Deps;
 use governance_types::errors::ContractError;
-use governance_types::types::{ConfigResponse, StatusResponse, Settlement, ResolvedResult};
-use crate::state::read_config;
+use governance_types::types::{ConfigResponse, StatusResponse, Settlement, ResolvedResult,
+    VoterResponse};
+use crate::state::{read_config,already_voted,get_whitelist_status};
 
 pub fn query_config(
     deps: Deps,
@@ -55,4 +56,15 @@ pub fn query_status(
     }
 
     Ok(resp)
+}
+
+pub fn query_voter(
+    deps: Deps,
+    address: String,
+) -> Result<VoterResponse, ContractError> {
+    let addr = deps.api.addr_canonicalize(address.as_str())?;
+    Ok(VoterResponse {
+        is_whitelisted : get_whitelist_status(deps.storage, addr.as_slice()),
+        already_voted : already_voted(deps.storage, addr.as_slice()),
+    })
 }

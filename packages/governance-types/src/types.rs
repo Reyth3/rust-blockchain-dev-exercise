@@ -35,7 +35,8 @@ pub struct ConfigResponse {
 }
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct VoterResponse {
-    pub vote : i8,
+    pub is_whitelisted : bool,
+    pub already_voted : bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
