@@ -3,9 +3,9 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, to_binary};
 use governance_types::errors::ContractError;
 use governance_types::types::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::execute::{execute_vote, execute_whitelist};
+use crate::execute::{execute_vote, execute_whitelist, execute_close};
 use crate::queries::query_config;
-use crate::state::{Config, store_config, read_config};
+use crate::state::{Config, store_config};
 
 
 // Method is executed when a new contract instance is created. You can treat it as a constructor.
@@ -46,7 +46,8 @@ pub fn execute(
     match msg {
         // TODO add required method types and handlers for each.
         ExecuteMsg::Whitelist { address, status } => execute_whitelist(deps, env, info, address, status),
-        ExecuteMsg::Vote { vote } => execute_vote(deps, env, info, vote)
+        ExecuteMsg::Vote { vote } => execute_vote(deps, env, info, vote),
+        ExecuteMsg::Close {} => execute_close(deps, env, info)
     }
 }
 

@@ -37,7 +37,7 @@ pub fn store_config(storage: &mut dyn Storage, config: &Config) -> StdResult<()>
 }
 
 pub fn read_config(storage: &dyn Storage) -> StdResult<Config> {
-    CONFIG.load(storage);
+    return CONFIG.load(storage);
 }
 
 // ===============
@@ -53,9 +53,9 @@ pub fn cast_vote(storage: &mut dyn Storage, addr: &[u8], vote: i8) -> StdResult<
 
 pub fn count_votes(storage : &dyn Storage) -> StdResult<VoteSummary>
 {
-    let fc : u32 = 0;
-    let ac : u32 = 0;
-    let abc : u32 = 0;
+    let mut fc : u32 = 0;
+    let mut ac : u32 = 0;
+    let mut abc : u32 = 0;
 
 
     /* Okay let's scrap that

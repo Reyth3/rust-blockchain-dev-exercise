@@ -86,8 +86,6 @@ pub fn execute_close(
     store_config(deps.storage, &cfg)?;
 
     return Ok(Response::new()
-        .add_attribute("action", "execute whitelist")
-        .add_attribute("address", address)
-        .add_attribute("status", status.to_string())
+        .add_attribute("action", "execute close")
     );
 }
