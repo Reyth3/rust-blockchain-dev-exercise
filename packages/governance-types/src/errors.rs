@@ -12,4 +12,8 @@ pub enum ContractError {
 
     #[error("AlreadyVoted")]
     AlreadyVoted { voter: Addr },
+
+    #[error("AlreadyVoted")]
+    NotFulfilled { }, // The specified requirements haven't been met yet.
+    
 }

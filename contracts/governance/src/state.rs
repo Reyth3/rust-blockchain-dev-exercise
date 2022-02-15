@@ -37,7 +37,7 @@ pub fn store_config(storage: &mut dyn Storage, config: &Config) -> StdResult<()>
 }
 
 pub fn read_config(storage: &dyn Storage) -> StdResult<Config> {
-    CONFIG.load(storage)
+    CONFIG.load(storage);
 }
 
 // ===============
@@ -51,11 +51,66 @@ pub fn cast_vote(storage: &mut dyn Storage, addr: &[u8], vote: i8) -> StdResult<
     return VOTES.save(storage, addr, &vote);
 }
 
-pub fn count_votes(storage : &dyn Storage)
+pub fn count_votes(storage : &dyn Storage) -> StdResult<VoteSummary>
 {
-    for VOTES.range(storage, None, None, Order::Ascending) {
+    let fc : u32 = 0;
+    let ac : u32 = 0;
+    let abc : u32 = 0;
 
+
+    /* Okay let's scrap that
+    // loosely inspired by this production ready cw20 allowances enum impl: https://github.com/Papi94/cosmwasm-plus/blob/main/contracts/cw20-base/src/enumerable.rs
+    VOTES.range(storage, None, None, Order::Ascending).enumerate().for_each(|(i, x)| {
+        //let r : StdResult<(Vec<u8>, i8)> = x;
+        // let (k,v) = r?; <- errors out so let's try another thing
+        match x {
+            Ok(e) => {
+                let (k,v) = e; // Somehow this seems to have worked, while 'r?' straight up to get the tuple didn't. Is it because the for_each() is considered a scope hee, not the function, and foreach doesn't return a Result<T>?
+                // I'd rather have this look a bit more ugly than try shortcuts and mess something up in the process tbh
+                if v == -1 { // Against
+                    ac += 1;
+                }
+                else if v == 0 { // Abstain
+                    abc += 1;
+                }
+                else if v == 1 {
+                    fc += 1;
+                }
+            },
+            Err(e) => (),
+        }
+
+        
+    }); */
+
+    // This is the new way.
+    let enumerate = VOTES.range(storage, None, None, Order::Ascending).enumerate();
+    for vote in enumerate {
+        let (i, item) = vote;
+        let (k,v) = item?;
+        // I'd rather have this look a bit more ugly than try shortcuts and mess something up in the process tbh
+        if v == -1 { // Against
+            ac += 1;
+        }
+        else if v == 0 { // Abstain
+            abc += 1;
+        }
+        else if v == 1 {
+            fc += 1;
+        }
     }
+
+    let cfg = read_config(storage)?;
+    let fp = fc * 100 / cfg.cur_votes;
+    let ap = ac * 100 / cfg.cur_votes;
+
+    return Ok(VoteSummary {
+        for_count : fc,
+        abstain_count : abc,
+        against_count : ac,
+        for_percentage : fp as u8,
+        against_percentage : ap as u8,
+    });
 }
 
 // ===============

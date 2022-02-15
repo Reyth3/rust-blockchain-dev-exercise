@@ -1,7 +1,9 @@
 use cosmwasm_std::{DepsMut, Env, MessageInfo, Response};
 use governance_types::errors::ContractError;
 use crate::state::{cast_vote,already_voted,
-    read_config,store_config,set_whitelist_status,get_whitelist_status}; // I don't think I can actually do it like that, since this is a dependant package? But I don't have any other ideas
+    read_config,store_config,set_whitelist_status,get_whitelist_status,
+    count_votes}; // I don't think I can actually do it like that, since this is a dependant package? But I don't have any other ideas
+use std::cmp;
 
 pub fn execute_vote(
     deps: DepsMut,
@@ -66,8 +68,18 @@ pub fn execute_close(
 ) -> Result<Response, ContractError> {
     
     let mut cfg = read_config(deps.storage)?;
-    if info.sender != cfg.admin {
+    if info.sender != cfg.admin { // Only admin can close the voting
         return Err(ContractError::Unauthorized {});
+    }
+
+    if cfg.cur_votes < cfg.min_votes { // The min votes requirements has to be met
+        return Err(ContractError::NotFulfilled {});
+    }
+
+    let votes = count_votes(deps.storage)?;
+    let highest_percentage = cmp::max(votes.for_percentage, votes.against_percentage);
+    if highest_percentage < cfg.percentage { // The percentage requirement not met
+        return Err(ContractError::NotFulfilled {});
     }
         
     cfg.ongoing = false;
