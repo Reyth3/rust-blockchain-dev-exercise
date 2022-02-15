@@ -39,11 +39,29 @@ pub struct VoterResponse {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub enum ResolvedResult {
+    For,
+    Against,
+    Tie
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub enum Settlement {
+    Resolved {
+        result : ResolvedResult,
+        for_votes : u32,
+        against_votes : u32,
+        abstain_votes : u32,
+        for_percentage : u8,
+        against_percentage : u8,
+    },
+    Ongoing {},
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct StatusResponse {
-    pub can_close : bool,
-    pub for_votes : u32,
-    pub against_votes : u32,
-    pub abstain_votes : u32,
+    pub settlement : Settlement,
+    pub votes : u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

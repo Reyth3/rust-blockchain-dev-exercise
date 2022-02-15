@@ -1,6 +1,7 @@
+use crate::state::count_votes;
 use cosmwasm_std::Deps;
 use governance_types::errors::ContractError;
-use governance_types::types::ConfigResponse;
+use governance_types::types::{ConfigResponse, StatusResponse, Settlement, ResolvedResult};
 use crate::state::read_config;
 
 pub fn query_config(
@@ -16,6 +17,42 @@ pub fn query_config(
         percentage : cfg.percentage, 
         cur_votes : cfg.cur_votes
     };
+
+    Ok(resp)
+}
+
+pub fn query_status(
+    deps: Deps,
+) -> Result<StatusResponse, ContractError> {
+    let cfg = read_config(deps.storage)?;
+
+    let mut resp = StatusResponse {
+        settlement : Settlement::Ongoing {},
+        votes : cfg.cur_votes,
+    };
+
+    if cfg.ongoing == false {
+        let votes = count_votes(deps.storage)?;
+        let mut result : Option<ResolvedResult> = None;
+        let for_win = votes.for_count > votes.against_count;
+        let tie = votes.for_count == votes.against_count;
+        if for_win {
+            result = Some(ResolvedResult::For);
+        }
+        else if tie {
+            result = Some(ResolvedResult::Tie);
+        }
+        else { result = Some(ResolvedResult::Against); }
+        
+        resp.settlement = Settlement::Resolved {
+            for_votes : votes.for_count,
+            for_percentage : votes.for_percentage,
+            against_votes : votes.against_count,
+            against_percentage : votes.against_percentage,
+            abstain_votes : votes.abstain_count,
+            result : result.unwrap() // here unwrap() should be fine since we're handling else exhaustively up there
+        }
+    }
 
     Ok(resp)
 }

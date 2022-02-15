@@ -44,7 +44,7 @@ pub fn execute_whitelist(
     status : bool
 ) -> Result<Response, ContractError> {
     
-    let mut cfg = read_config(deps.storage)?;
+    let cfg = read_config(deps.storage)?;
     if info.sender != cfg.admin {
         return Err(ContractError::Unauthorized {});
     }
